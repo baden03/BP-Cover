@@ -76,57 +76,54 @@ function bp_cover_avatar_box($args = '') {
 }
 
 function select_pic_for_cover($activity_id ) {
-   global $bp;
-   $user_id=bp_loggedin_user_id();
-   $activity_id = $_POST['activity_id'];
-   $attachment_id = bp_activity_get_meta( $activity_id, 'bp_cover_activity', true );
-   $fileurl = wp_get_attachment_image_src( $attachment_id ,'full');
-        update_user_meta($user_id,'bp_cover',$fileurl[0]);
-		update_user_meta($user_id,'bp_cover_height',$fileurl[2]);
-		delete_user_meta($user_id,'bp_cover_position');
+	global $bp;
+	$user_id=bp_loggedin_user_id();
+	$activity_id = $_POST['activity_id'];
+	$attachment_id = bp_activity_get_meta( $activity_id, 'bp_cover_activity', true );
+	$fileurl = wp_get_attachment_image_src( $attachment_id ,'large');
+	update_user_meta($user_id,'bp_cover',$fileurl[0]);
+	update_user_meta($user_id,'bp_cover_height',$fileurl[2]);
+	delete_user_meta($user_id,'bp_cover_position');
 }
 add_action('wp_ajax_select_pic_for_cover', 'select_pic_for_cover');
 
 function button_rtmedia_for_cover($media_id ) {
-global $rtmedia_media, $rtmedia,$bp;
-   $user_id=bp_loggedin_user_id();
-   $media_id = rtmedia_id();
-   if ( isset( $rtmedia_media->media_type ) ) {
-   $author_id = $rtmedia_media->media_author;
+	global $rtmedia_media, $rtmedia,$bp;
+	$user_id=bp_loggedin_user_id();
+	$media_id = rtmedia_id();
+	if ( isset( $rtmedia_media->media_type ) ) {
+		$author_id = $rtmedia_media->media_author;
 		if ( $rtmedia_media->media_type == 'photo' ) {
-		if ( bp_displayed_user_id () ) {
-		if ($user_id == $author_id){
-     echo '<a href="#" class="rtmcover" title="'.__("Select", "bp-cover").'" onclick="select_pic_rtmedia_for_cover(\''.$media_id.'\', \''.admin_url( 'admin-ajax.php' ).'\'); return false;">
-					'.__("Set Cover", "bp-cover").'</a>';
-
-					}
-					} else if ( bp_is_group () ) {
-					if (is_admin() || $bp->is_item_admin ) {
-	 echo '<a href="#" class="rtmcover" title="'.__("Select", "bp-cover").'" onclick="select_pic_rtmedia_for_cover_group(\''.$media_id.'\', \''.admin_url( 'admin-ajax.php' ).'\'); return false;">
-					'.__("Set Cover group", "bp-cover").'</a>';
-
-				   }
+			if ( bp_displayed_user_id () ) {
+				if ($user_id == $author_id){
+     				echo '<a href="#" class="rtmcover" title="'.__("Select", "bp-cover").'" onclick="select_pic_rtmedia_for_cover(\''.$media_id.'\', \''.admin_url( 'admin-ajax.php' ).'\'); return false;">
+						'.__("Set Cover", "bp-cover").'</a>';
+				}
+			} else if ( bp_is_group () ) {
+				if (is_admin() || $bp->is_item_admin ) {
+					echo '<a href="#" class="rtmcover" title="'.__("Select", "bp-cover").'" onclick="select_pic_rtmedia_for_cover_group(\''.$media_id.'\', \''.admin_url( 'admin-ajax.php' ).'\'); return false;">
+						'.__("Set Cover group", "bp-cover").'</a>';
 				}
 			}
 		}
-
+	}
 }
 add_action('rtmedia_action_buttons_after_media', 'button_rtmedia_for_cover');
 
 function select_pic_rtmedia_for_cover($photo_id ) {
-  global $wpdb;
-   $photo_id = $_POST['photo_id'];
-   $user_id=bp_loggedin_user_id();
-   $tmb_qry = " SELECT media_id FROM ".$wpdb->prefix."rt_rtm_media WHERE media_author='".$user_id."' AND id='".$photo_id."'  AND media_type='photo' ORDER BY id DESC LIMIT 0, 8 ";
-   $tmb_res = $wpdb->get_results($tmb_qry);
-   if(!empty($tmb_res)) {
-	    foreach($tmb_res as $tmb_dat) {
-        $media_id = $tmb_dat->media_id;
-        $src = wp_get_attachment_image_src($media_id );
-		update_user_meta($user_id,'bp_cover',$src[0]);
+	global $wpdb;
+	$photo_id = $_POST['photo_id'];
+	$user_id=bp_loggedin_user_id();
+	$tmb_qry = " SELECT media_id FROM ".$wpdb->prefix."rt_rtm_media WHERE media_author='".$user_id."' AND id='".$photo_id."'  AND media_type='photo' ORDER BY id DESC LIMIT 0, 8 ";
+	$tmb_res = $wpdb->get_results($tmb_qry);
+	if(!empty($tmb_res)) {
+		foreach($tmb_res as $tmb_dat) {
+        	$media_id = $tmb_dat->media_id;
+        	$src = wp_get_attachment_image_src($media_id );
+			update_user_meta($user_id,'bp_cover',$src[0]);
 		}
     }
-      delete_user_meta($user_id,'bp_cover_position');
+    delete_user_meta($user_id,'bp_cover_position');
 }
 add_action('wp_ajax_select_pic_rtmedia_for_cover', 'select_pic_rtmedia_for_cover');
 
@@ -135,22 +132,22 @@ function delete_pic_cover($activity_id ) {
    $user_id=bp_loggedin_user_id();
    $activity_id = $_POST['activity_id'];
    $attachment_id = bp_activity_get_meta( $activity_id, 'bp_cover_activity', true );
-        wp_delete_attachment( $attachment_id,true);
-		delete_post_meta( $attachment_id,true);
-        delete_user_meta($user_id,'bp_cover');
-		delete_user_meta($user_id,'bp_cover_position');
-		bp_activity_delete( array( 'id' => $activity_id, 'user_id' => $bp->loggedin_user->id ) );
-		BP_Activity_Activity::delete_activity_meta_entries( $activity_id );
+    wp_delete_attachment( $attachment_id,true);
+	delete_post_meta( $attachment_id,true);
+    delete_user_meta($user_id,'bp_cover');
+	delete_user_meta($user_id,'bp_cover_position');
+	bp_activity_delete( array( 'id' => $activity_id, 'user_id' => $bp->loggedin_user->id ) );
+	BP_Activity_Activity::delete_activity_meta_entries( $activity_id );
 }
 add_action('wp_ajax_delete_pic_cover', 'delete_pic_cover');
 
 function bp_cover_position( ) {
-    $user_id=bp_loggedin_user_id();
-    $id = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
-    update_user_meta( $user_id, 'bp_cover_position', $id );
-    if( empty( $id ) )
-    return;
-  echo $id;
+	$user_id=bp_loggedin_user_id();
+	$id = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
+	update_user_meta( $user_id, 'bp_cover_position', $id );
+	if( empty( $id ) )
+		return;
+	echo $id;
 }
 add_action('wp_ajax_bp_cover_position', 'bp_cover_position');
 add_action('wp_ajax_nopriv_bp_cover_position','bp_cover_position');
@@ -161,6 +158,7 @@ function core_get_user_displayname_box( $user_id ) {
 	$user_info = get_userdata( $user_id );
 	return $user_info->user_nicename;
 }
+
 function core_get_user_id_box( $user_id ) {
 	$user_info = get_userdata( $user_id );
 	return $user_info->ID;
@@ -170,120 +168,115 @@ function core_get_user_description_box( $user_id ) {
 	$user_description = get_userdata( $user_id );
 	return $user_description->description;
 }
+
 function core_get_user_description_limit( $user_id ) {
 	$user_bio = core_get_user_description_box( $user_id );
 	$biography = wp_trim_words( $user_bio, 15, '...' );
 	return $biography;
 }
+
 function bp_cover_delete($activity_id){
- global $bp;
-     delete_user_meta(bp_loggedin_user_id(),'bp_cover');
-	 delete_user_meta(bp_loggedin_user_id(),'bp_cover_position');
-	  die();
+	global $bp;
+	delete_user_meta(bp_loggedin_user_id(),'bp_cover');
+	delete_user_meta(bp_loggedin_user_id(),'bp_cover_position');
+	die();
 }
 add_action('wp_ajax_bp_cover_delete', 'bp_cover_delete');
 
 function bp_cover_refresh() {
- global $bp;
+	global $bp;
 	$user_id=$bp->displayed_user->id;
-     if(empty($user_id))
-         return false;
-     $image=get_user_meta($user_id, 'bp_cover', true);
-		  $filter = " <div class='image-upload-container'>
-				 <img class='img-profile-header-background' id='user-banner-image'
-                 src='$image'width='100%' style='width: 100%;'> </div>";
-		 echo $filter;
-		die();
-	}
+    if(empty($user_id))
+		return false;
+	$image=get_user_meta($user_id, 'bp_cover', true);
+	$filter = " <div class='image-upload-container'>
+		 <img class='img-profile-header-background' id='user-banner-image'
+         src='$image'width='100%' style='width: 100%;'> </div>";
+	echo $filter;
+	die();
+}
 add_action('wp_ajax_bp_cover_refresh', 'bp_cover_refresh');
 
 function bp_avatar_refresh() {
- global $bp;
-    	//$avatar_url = bp_core_fetch_avatar( array( 'type' => 'full', 'html' => false, 'item_id' => $user_id ) );
-		  //$filter = " <div class='ava'> <img class='img-rounded profile-user-photo' id='user-profile-image' width='150' height='150' src=".$avatar_url."></div>";
-		$filter = " <div class='ava'>".bp_core_fetch_avatar( array( 'type' => 'full') )."</div>";
-		 echo $filter;
-		die();
-	}
+	global $bp;
+	//$avatar_url = bp_core_fetch_avatar( array( 'type' => 'full', 'html' => false, 'item_id' => $user_id ) );
+	//$filter = " <div class='ava'> <img class='img-rounded profile-user-photo' id='user-profile-image' width='150' height='150' src=".$avatar_url."></div>";
+	$filter = " <div class='ava'>".bp_core_fetch_avatar( array( 'type' => 'full') )."</div>";
+	echo $filter;
+	die();
+}
 add_action('wp_ajax_bp_avatar_refresh', 'bp_avatar_refresh');
 
 function bp_cover_handle_upload() {
-global $bp, $wpdb;
-	if(!$user_id&&$bp->displayed_user->id)
-         $user_id=$bp->displayed_user->id;
+	global $bp, $wpdb;
+	if(empty($user_id) && !empty($bp->displayed_user->id))
+         $user_id = $bp->displayed_user->id;
     if(empty($user_id))
         return false;
-		$activity_table = $wpdb->prefix."bp_activity";
-		$activity_meta_table = $wpdb->prefix."bp_activity_meta";
-		$sql = "SELECT COUNT(*) as photo_count FROM $activity_table a INNER JOIN $activity_meta_table am ON a.id = am.activity_id WHERE a.user_id = %d AND meta_key = 'bp_cover_activity'";
-		$sql = $wpdb->prepare( $sql, $user_id );
-		$cnt = $wpdb->get_var( $sql );
-		$max_cnt =bp_cover_get_max_total();
+	$activity_table = $wpdb->prefix."bp_activity";
+	$activity_meta_table = $wpdb->prefix."bp_activity_meta";
+	$sql = "SELECT COUNT(*) as photo_count FROM $activity_table a INNER JOIN $activity_meta_table am ON a.id = am.activity_id WHERE a.user_id = %d AND meta_key = 'bp_cover_activity'";
+	$sql = $wpdb->prepare( $sql, $user_id );
+	$cnt = $wpdb->get_var( $sql );
+	$max_cnt =bp_cover_get_max_total();
     if( $cnt < $max_cnt ) {
-	if( $_POST['encodedimg'] ) {
-    $file =  $_POST['imgsize'] ;
-	$max_upload_size=bp_cover_get_max_media_size();
-      if( $max_upload_size > $file){
-      $imgresponse = array();
-      $uploaddir =wp_upload_dir();
-      /* let's decode the base64 encoded image sent */
-      $img = $_POST['encodedimg'];
-      $img = str_replace('data:'.$_POST['imgtype'].';base64,', '', $img);
-      $img = str_replace(' ', '+', $img);
-      $data = base64_decode($img);
+		if( $_POST['encodedimg'] ) {
+    		$file =  $_POST['imgsize'] ;
+			$max_upload_size=bp_cover_get_max_media_size();
+			if( $max_upload_size > $file){
+				$imgresponse = array();
+				$uploaddir =wp_upload_dir();
+				/* let's decode the base64 encoded image sent */
+				$img = $_POST['encodedimg'];
+				$img = str_replace('data:'.$_POST['imgtype'].';base64,', '', $img);
+				$img = str_replace(' ', '+', $img);
+				$data = base64_decode($img);
 
-      $imgname = wp_unique_filename( $uploaddir['path'], $_POST['imgname'] );
-      $filepath = $uploaddir['path'] . '/' . $imgname;
-      $fileurl = $uploaddir['url'] . '/' . $imgname;
+				$imgname = wp_unique_filename( $uploaddir['path'], $_POST['imgname'] );
+				$filepath = $uploaddir['path'] . '/' . $imgname;
+				$fileurl = $uploaddir['url'] . '/' . $imgname;
 
-      /* now we write the image in dir */
+				/* now we write the image in dir */
 
-      $success = file_put_contents($filepath, $data);
+				$success = file_put_contents($filepath, $data);
 
-      if($success){
-         $imgresponse[0] = "1";
-         $imgresponse[1] = $fileurl;
+				if($success){
+					$imgresponse[0] = "1";
+					$imgresponse[1] = $fileurl;
 
-        update_user_meta(bp_loggedin_user_id(),'bp_cover',$fileurl);
-		delete_user_meta(bp_loggedin_user_id(),'bp_cover_position');
+					update_user_meta(bp_loggedin_user_id(),'bp_cover',$fileurl);
+					delete_user_meta(bp_loggedin_user_id(),'bp_cover_position');
 
-		do_action('bp_cover_uploaded',$fileurl);
+					do_action('bp_cover_uploaded',$fileurl);
 
-      } else {
-         $imgresponse[0] = "0";
-         $imgresponse[1] = __('Upload Failed! Unable to write the image on server', 'bp-cover');
-
-      }
-	  } else {
-         $imgresponse[0] = "0";
-         $imgresponse[1] = sprintf( __( 'The file you uploaded is too big. Please upload a file under %s', 'bp-cover'), size_format($max_upload_size) );
-
-      }
-
-   }else {
-      $imgresponse[0] = "0";
-      $imgresponse[1] = __('Upload Failed! No image sent', 'bp-cover');
-
-   }
-
-    }else {
-      $imgresponse[0] = "0";
-      $imgresponse[1] = sprintf( __('Max total images allowed %d in a cover gallery', 'bp-cover'),$max_cnt);
-
-   }
+				} else {
+					$imgresponse[0] = "0";
+					$imgresponse[1] = __('Upload Failed! Unable to write the image on server', 'bp-cover');
+				}
+			} else {
+				$imgresponse[0] = "0";
+				$imgresponse[1] = sprintf( __( 'The file you uploaded is too big. Please upload a file under %s', 'bp-cover'), size_format($max_upload_size) );
+			}
+		}else {
+			$imgresponse[0] = "0";
+			$imgresponse[1] = __('Upload Failed! No image sent', 'bp-cover');
+		}
+	}else {
+		$imgresponse[0] = "0";
+		$imgresponse[1] = sprintf( __('Max total images allowed %d in a cover gallery', 'bp-cover'),$max_cnt);
+	}
    /* if everything is ok, we send back url to thumbnail and to full image */
    echo json_encode( $imgresponse );
    die();
 }
-
 add_action('wp_ajax_bp_cover_handle_upload', 'bp_cover_handle_upload');
 add_action( 'wp_ajax_nopriv_bp_cover_handle_upload', 'bp_cover_handle_upload' );
 
 function bp_cover_get_max_total(){
-$total=get_option('bp_cover_profie_item');
-$size_in_kb=20;
-    if(empty ($total))
-        $total=$size_in_kb;
+	$total = get_option('bp_cover_profie_item');
+	$size_in_kb = 20;
+    if( empty ($total) )
+        $total = $size_in_kb;
 
    return apply_filters("bp_cover_get_max_total",$total);
 }
@@ -406,9 +399,8 @@ function bp_cover_get_avatar_scr($user_id=false){
 
 function bp_cover_record_activity() {
 	global $bp;
-	if(!$user_id&&$bp->displayed_user->id)
+	if(empty($user_id) && !empty($bp->displayed_user->id))
 		$user_id=$bp->displayed_user->id;
-
 	if(empty($user_id))
 		return false;
 	if ( !function_exists( 'bp_activity_add' ) )
