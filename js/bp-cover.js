@@ -198,10 +198,12 @@ jQuery('.uploadBox').each(function() {
                 'imgsize':size
             },
             function(response) {
-                if( response[0] != "0" ) {
+                if( response[0] != undefined && response[0] != "0" ) {
                     sendToContentEditable( response[1], response[2]);
                 } else {
-                    alert(response[1]);
+                    if(response[1] != undefined){
+                        alert(response[1]);
+                    }
                     jQuery('#bpci-polaroid-upload-banner').removeClass('bpci-loading');
                 };
             }, 'json');
