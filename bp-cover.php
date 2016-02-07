@@ -48,9 +48,12 @@ add_action( 'bp_before_group_header', 'bp_cover_scripts' );
 
 function bp_cover_enqueue_scripts() {
     wp_enqueue_style( 'bp-cover-css', BPCO_PLUGIN_URL . 'css/bp-cover.css');
-	//wp_enqueue_script( 'jquery-ui-js', BPCO_PLUGIN_URL . 'js/jquery-ui.min.js');
 	wp_enqueue_script('jquery');
-	wp_enqueue_script('jquery-ui-core');
+	//wp_enqueue_script( 'jquery-ui-js', BPCO_PLUGIN_URL . 'js/jquery-ui.min.js');
+
+	//wp_enqueue_script('jquery-ui-core');
+	wp_enqueue_script('jquery-ui-draggable');
+
 	wp_enqueue_script( 'bp-cover-js', BPCO_PLUGIN_URL . 'js/bp-cover.js', $dep = array(), $version = BPCO_PLUGIN_VERSION );
 }
 
